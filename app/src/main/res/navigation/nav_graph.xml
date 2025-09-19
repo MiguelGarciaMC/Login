@@ -7,5 +7,16 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.login.ui.login.LoginFragment"
-        android:label="Login" />
+        android:label="Login">
+
+        <!-- Acción que lleva de Login a Welcome -->
+        <action
+            android:id="@+id/action_loginFragment_to_welcomeFragment"
+            app:destination="@id/welcomeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.example.login.ui.welcome.WelcomeFragment"
+        android:label="Welcome" />
 </navigation>
