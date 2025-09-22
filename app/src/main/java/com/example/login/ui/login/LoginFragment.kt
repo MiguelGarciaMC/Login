@@ -8,11 +8,17 @@ import androidx.fragment.app.Fragment
 import com.example.login.databinding.FragmentLoginBinding
 import com.example.login.R
 import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import android.widget.Toast
+import kotlinx.coroutines.launch
+import com.example.login.data.TokenRepository
 
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,7 +39,27 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.login.isEnabled = true
         binding.login.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
+            viewModel.simulateLoginAndSave(
+                onSaved = {
+                    findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
+                },
+                onError = { e ->
+                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        lifecycleScope.launch {
+            val token = TokenRepository.getInstance(requireContext()).getTokenOnce()
+            if (!token.isNullOrBlank()) {
+                findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
+
+            }
         }
     }
 }
