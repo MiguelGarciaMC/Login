@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.login.databinding.FragmentLoginBinding
+import com.example.login.R
+import androidx.navigation.fragment.findNavController
 
 class LoginFragment : Fragment() {
 
@@ -24,5 +26,14 @@ class LoginFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.login.isEnabled = true
+        binding.login.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
+        }
     }
 }
