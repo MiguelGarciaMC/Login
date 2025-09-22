@@ -1,6 +1,5 @@
 package com.example.login.ui.login
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,7 @@ import com.example.login.R
 import com.example.login.databinding.FragmentLoginBinding
 import com.example.login.network.ApiClient
 import com.example.login.network.LoginRequest
+import com.example.login.network.LoginResponse
 import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
@@ -31,6 +31,7 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Botón de login
         binding.btnLogin.setOnClickListener {
             val username = binding.etUsername.text.toString()
             val password = binding.etPassword.text.toString()
@@ -41,14 +42,20 @@ class LoginFragment : Fragment() {
                 Toast.makeText(requireContext(), "Completa los campos", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Botón de registro
+        binding.btnRegister.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
+        }
     }
 
     private fun loginUser(username: String, password: String) {
         lifecycleScope.launch {
             try {
                 val response = ApiClient.retrofitService.login(LoginRequest(username, password))
+
                 if (response.isSuccessful && response.body() != null) {
-                    val token = response.body()!!.accessToken
+                    val token = response.body()!!.token  // Asegúrate de que tu LoginResponse tenga 'token'
 
                     // Guardar token en SharedPreferences
                     val prefs = requireContext().getSharedPreferences("app_prefs", 0)
@@ -57,10 +64,11 @@ class LoginFragment : Fragment() {
                     // Navegar a WelcomeFragment
                     findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
                 } else {
-                    Toast.makeText(requireContext(), "Error en login", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
                 }
+
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Error de conexión: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

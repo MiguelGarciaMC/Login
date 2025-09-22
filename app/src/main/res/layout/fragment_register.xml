@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.login.LoginFragment">
+    tools:context=".ui.register.RegisterFragment" >
 
     <LinearLayout
         android:id="@+id/container"
@@ -34,17 +34,18 @@
             android:inputType="textPassword"
             android:layout_marginBottom="16dp"/>
 
-        <Button
-            android:id="@+id/btnLogin"
+        <EditText
+            android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ingresar"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
             android:layout_marginBottom="16dp"/>
 
         <Button
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registrarse"/>
+            android:text="Registrar"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
