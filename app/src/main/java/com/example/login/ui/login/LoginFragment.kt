@@ -12,7 +12,9 @@ import com.example.login.R
 import com.example.login.databinding.FragmentLoginBinding
 import com.example.login.network.ApiClient
 import com.example.login.network.LoginRequest
+import com.example.login.network.LoginResponse
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class LoginFragment : Fragment() {
 
@@ -30,7 +32,6 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Botón de login
         binding.btnLogin.setOnClickListener {
             val username = binding.etUsername.text.toString()
             val password = binding.etPassword.text.toString()
@@ -41,20 +42,17 @@ class LoginFragment : Fragment() {
                 Toast.makeText(requireContext(), "Completa los campos", Toast.LENGTH_SHORT).show()
             }
         }
-
-        // Botón de registro
-        binding.btnRegister.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
-        }
     }
 
     private fun loginUser(username: String, password: String) {
         lifecycleScope.launch {
             try {
-                val response = ApiClient.retrofitService.login(LoginRequest(username, password))
+                // Llamada POST real a DummyJSON
+                val response: Response<LoginResponse> =
+                    ApiClient.retrofitService.login(LoginRequest(username, password))
 
                 if (response.isSuccessful && response.body() != null) {
-                    val token = response.body()!!.token  // Asegúrate de que tu LoginResponse tenga 'token'
+                    val token = response.body()!!.token
 
                     // Guardar token en SharedPreferences
                     val prefs = requireContext().getSharedPreferences("app_prefs", 0)
