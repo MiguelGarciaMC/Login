@@ -1,10 +1,11 @@
-package com.example.login.fragments
+package com.example.login.ui.welcome
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.login.databinding.FragmentWelcomeBinding
 
 class WelcomeFragment : Fragment() {
@@ -23,13 +24,11 @@ class WelcomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Recuperar el nombre de usuario pasado desde LoginFragment
         val username = arguments?.getString("USERNAME") ?: "Usuario"
         binding.txtWelcome.text = "¡Bienvenido, $username!"
 
-        //Botón de cerrar sesión vuelve al LoginFragment
         binding.btnLogout.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().popBackStack()
         }
     }
 
