@@ -5,15 +5,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
+    private const val BASE_URL = "https://dummyjson.com/"
 
-    private const val BASE_URL = "https://api.com/" //Aqui se pondrá la url del back
-
-    val instance: AuthService by lazy {
-        val retrofit = Retrofit.Builder()
+    val retrofitService: AuthService by lazy {
+        Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create()) //Convierte a JSON
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
-
-        retrofit.create(AuthService::class.java)
+            .create(AuthService::class.java)
     }
 }
