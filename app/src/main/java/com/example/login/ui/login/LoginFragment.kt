@@ -12,7 +12,6 @@ import com.example.login.R
 import com.example.login.databinding.FragmentLoginBinding
 import com.example.login.network.ApiClient
 import com.example.login.network.LoginRequest
-import com.example.login.network.LoginResponse
 import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {

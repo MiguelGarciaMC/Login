@@ -4,5 +4,9 @@ data class LoginResponse(
     val id: Int,
     val username: String,
     val email: String,
-    val token: String
+    val firstName: String,
+    val lastName: String,
+    val gender: String,
+    val image: String,
+    val token: String    // Aquí viene el token que DummyJSON genera
 )

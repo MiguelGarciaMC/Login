@@ -6,12 +6,19 @@ import retrofit2.http.POST
 
 interface AuthService {
 
-    @POST("register") // Endpoint de API para registro
-    suspend fun register(
-        @Body request: RegisterRequest
-    ): Response<RegisterResponse>
-
-    @POST("login")
+    // LOGIN real con DummyJSON
+    @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
+    // REGISTRO simulado (DummyJSON no lo soporta)
+    suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse> {
+        // Simulamos como si se hubiera registrado exitosamente
+        val fakeResponse = RegisterResponse(
+            id = 999,
+            username = request.username,
+            email = request.email,
+            message = "Usuario registrado (simulado)"
+        )
+        return Response.success(fakeResponse)
+    }
 }
