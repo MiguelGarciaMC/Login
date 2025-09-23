@@ -27,13 +27,16 @@ class WelcomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val username = arguments?.getString("USERNAME") ?: "Usuario"
-        binding.txtWelcome.text = "¡Bienvenido, $username!"
+        // Recuperar el firstName desde los argumentos
+        val firstName = arguments?.getString("FIRST_NAME") ?: "Usuario"
+        binding.txtWelcome.text = "¡Bienvenido, $firstName!"
 
+        // Logout
         binding.btnLogout.setOnClickListener {
             lifecycleScope.launch {
                 TokenRepository.getInstance(requireContext()).clearToken()
-                parentFragmentManager.popBackStack()
+                // Regresar al LoginFragment
+                findNavController().navigateUp()
             }
         }
     }
