@@ -18,7 +18,7 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
     ) {
         viewModelScope.launch {
             try {
-                authRepo.loginAndPersist(username, password) // guarda token internamente
+                authRepo.loginAndPersist(username, password)
                 onSuccess()
             } catch (e: Throwable) {
                 onError(e)

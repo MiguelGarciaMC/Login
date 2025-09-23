@@ -56,10 +56,10 @@ class LoginFragment : Fragment() {
                 if (response.isSuccessful && response.body() != null) {
                     val loginData = response.body()!!
 
-                    // Guardar token en DB/Room
+                    // Guarda token en DB/Room
                     TokenRepository.getInstance(requireContext()).saveToken(loginData.accessToken)
 
-                    // Pasar el firstName al WelcomeFragment
+                    // Pasa el firstName al WelcomeFragment
                     val bundle = Bundle().apply {
                         putString("FIRST_NAME", loginData.firstName)
                     }
@@ -81,7 +81,6 @@ class LoginFragment : Fragment() {
         lifecycleScope.launch {
             val token = TokenRepository.getInstance(requireContext()).getTokenOnce()
             if (!token.isNullOrBlank()) {
-                // Aquí puedes recuperar el firstName si lo guardaste en DB, o mostrar "Usuario"
                 val bundle = Bundle().apply {
                     putString("FIRST_NAME", "Usuario")
                 }
