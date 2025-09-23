@@ -3,20 +3,23 @@ package com.example.login.ui.login
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.login.auth.FakeAuthService
-import com.example.login.data.TokenRepository
+import com.example.login.data.auth.AuthRepository
 import kotlinx.coroutines.launch
 
 class LoginViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val repo = TokenRepository.getInstance(app.applicationContext)
+    private val authRepo = AuthRepository.getInstance(app)
 
-    fun simulateLoginAndSave(onSaved: () -> Unit, onError: (Throwable) -> Unit) {
+    fun login(
+        username: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (Throwable) -> Unit
+    ) {
         viewModelScope.launch {
             try {
-                val token = FakeAuthService.FAKE_TOKEN
-                repo.saveToken(token)   // guarda en Room
-                onSaved()
+                authRepo.loginAndPersist(username, password) // guarda token internamente
+                onSuccess()
             } catch (e: Throwable) {
                 onError(e)
             }

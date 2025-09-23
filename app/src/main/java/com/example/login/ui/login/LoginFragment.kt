@@ -4,62 +4,92 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.login.databinding.FragmentLoginBinding
-import com.example.login.R
-import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import android.widget.Toast
-import kotlinx.coroutines.launch
+import androidx.navigation.fragment.findNavController
+import com.example.login.R
 import com.example.login.data.TokenRepository
+import com.example.login.databinding.FragmentLoginBinding
+import com.example.login.network.ApiClient
+import com.example.login.network.LoginRequest
+import com.example.login.network.LoginResponse
+import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LoginViewModel by viewModels()
+    private val viewModel: LoginViewModel by viewModels() // si aún no lo usas, lo puedes dejar para futuro
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.login.isEnabled = true
-        binding.login.setOnClickListener {
-            viewModel.simulateLoginAndSave(
-                onSaved = {
+
+        binding.btnLogin.setOnClickListener {
+            val user = binding.etUsername.text.toString().trim()
+            val pass = binding.etPassword.text.toString().trim()
+
+            viewModel.login(
+                username = user,
+                password = pass,
+                onSuccess = {
                     findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
                 },
                 onError = { e ->
-                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), e.message ?: "Error de login", Toast.LENGTH_SHORT).show()
                 }
             )
         }
+    }
 
+    private fun loginUser(username: String, password: String) {
+        lifecycleScope.launch {
+            try {
+                // POST real (DummyJSON o tu API)
+                val response: Response<LoginResponse> =
+                    ApiClient.retrofitService.login(LoginRequest(username, password))
 
+                if (response.isSuccessful && response.body() != null) {
+                    val token = response.body()!!.accessToken
+
+                    // Guardar token en ROOM (tu enfoque de master)
+                    TokenRepository.getInstance(requireContext()).saveToken(token)
+
+                    // Navegar
+                    findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
+
+                } else {
+                    Toast.makeText(requireContext(), "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error de conexión: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun onStart() {
         super.onStart()
+        // Auto-login si ya hay token en DB (master)
         lifecycleScope.launch {
             val token = TokenRepository.getInstance(requireContext()).getTokenOnce()
             if (!token.isNullOrBlank()) {
                 findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
-
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
