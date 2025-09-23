@@ -8,5 +8,5 @@ data class LoginResponse(
     val lastName: String,
     val gender: String,
     val image: String,
-    val token: String    // Aquí viene el token que DummyJSON genera
+    val accessToken: String
 )

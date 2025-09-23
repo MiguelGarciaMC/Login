@@ -5,8 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.login.data.TokenRepository
 import com.example.login.databinding.FragmentWelcomeBinding
+import kotlinx.coroutines.launch
 
 class WelcomeFragment : Fragment() {
 
@@ -28,7 +31,10 @@ class WelcomeFragment : Fragment() {
         binding.txtWelcome.text = "¡Bienvenido, $username!"
 
         binding.btnLogout.setOnClickListener {
-            findNavController().popBackStack()
+            lifecycleScope.launch {
+                TokenRepository.getInstance(requireContext()).clearToken()
+                parentFragmentManager.popBackStack()
+            }
         }
     }
 
