@@ -22,7 +22,7 @@ class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LoginViewModel by viewModels() // si aún no lo usas, lo puedes dejar para futuro
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,41 +36,39 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnLogin.setOnClickListener {
-            val user = binding.etUsername.text.toString().trim()
-            val pass = binding.etPassword.text.toString().trim()
+            val username = binding.etUsername.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
 
-            viewModel.login(
-                username = user,
-                password = pass,
-                onSuccess = {
-                    findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
-                },
-                onError = { e ->
-                    Toast.makeText(requireContext(), e.message ?: "Error de login", Toast.LENGTH_SHORT).show()
-                }
-            )
+            if (username.isNotEmpty() && password.isNotEmpty()) {
+                loginUser(username, password)
+            } else {
+                Toast.makeText(requireContext(), "Completa los campos", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun loginUser(username: String, password: String) {
         lifecycleScope.launch {
             try {
-                // POST real (DummyJSON o tu API)
                 val response: Response<LoginResponse> =
                     ApiClient.retrofitService.login(LoginRequest(username, password))
 
                 if (response.isSuccessful && response.body() != null) {
-                    val token = response.body()!!.accessToken
+                    val loginData = response.body()!!
 
-                    // Guardar token en ROOM (tu enfoque de master)
-                    TokenRepository.getInstance(requireContext()).saveToken(token)
+                    // Guardar token en DB/Room
+                    TokenRepository.getInstance(requireContext()).saveToken(loginData.accessToken)
 
-                    // Navegar
-                    findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
+                    // Pasar el firstName al WelcomeFragment
+                    val bundle = Bundle().apply {
+                        putString("FIRST_NAME", loginData.firstName)
+                    }
+                    findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment, bundle)
 
                 } else {
                     Toast.makeText(requireContext(), "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
                 }
+
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error de conexión: ${e.message}", Toast.LENGTH_LONG).show()
             }
@@ -79,11 +77,15 @@ class LoginFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        // Auto-login si ya hay token en DB (master)
+        // Auto-login si ya hay token
         lifecycleScope.launch {
             val token = TokenRepository.getInstance(requireContext()).getTokenOnce()
             if (!token.isNullOrBlank()) {
-                findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment)
+                // Aquí puedes recuperar el firstName si lo guardaste en DB, o mostrar "Usuario"
+                val bundle = Bundle().apply {
+                    putString("FIRST_NAME", "Usuario")
+                }
+                findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment, bundle)
             }
         }
     }

@@ -8,12 +8,13 @@
     <!-- Texto de bienvenida -->
     <TextView
         android:id="@+id/txtWelcome"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:gravity="center"
         android:text="Bienvenido"
         android:textSize="24sp"
+        android:textStyle="bold"
+        android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnLogout"
         app:layout_constraintStart_toStartOf="parent"
