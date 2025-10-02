@@ -22,7 +22,7 @@ class AuthRepository private constructor(context: Context) {
             throw IllegalStateException("Error ${response.code()}: $msg")
         }
         val body = response.body() ?: throw IllegalStateException("Respuesta vacía")
-        tokenRepo.saveToken(body.accessToken)
+        tokenRepo.saveToken(body.accessToken, body.firstName)
         body.accessToken
     }
 

@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [TokenEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class TokenDatabase : RoomDatabase() {
@@ -22,7 +22,9 @@ abstract class TokenDatabase : RoomDatabase() {
                     context.applicationContext,
                     TokenDatabase::class.java,
                     "token.db"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration()
+                    .build().also { INSTANCE = it }
             }
         }
     }
