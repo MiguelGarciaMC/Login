@@ -13,9 +13,13 @@ class TokenRepository private constructor(context: Context) {
 
     suspend fun getTokenOnce(): String? = dao.getTokenOnce()
 
-    suspend fun saveToken(token: String) {
-        dao.upsert(TokenEntity(token = token))
+    //Modificado para guardar tanto token como firstName
+    suspend fun saveToken(token: String, firstName: String) {
+        dao.upsert(TokenEntity(token = token, firstName = firstName))
     }
+
+    //Se agrega el método para obtener el usuario
+    suspend fun getUser(): TokenEntity? = dao.getUser()
 
     suspend fun clearToken() {
         dao.clear()

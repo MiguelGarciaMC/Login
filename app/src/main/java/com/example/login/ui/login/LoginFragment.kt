@@ -56,10 +56,12 @@ class LoginFragment : Fragment() {
                 if (response.isSuccessful && response.body() != null) {
                     val loginData = response.body()!!
 
-                    // Guarda token en DB/Room
-                    TokenRepository.getInstance(requireContext()).saveToken(loginData.accessToken)
+                    // Guardar token en DB/Room
+                    TokenRepository.getInstance(requireContext()).saveToken(loginData.accessToken, loginData.firstName)
 
-                    // Pasa el firstName al WelcomeFragment
+                    android.util.Log.d("DEBUG_NAV", "Navigating with FIRST_NAME=${loginData.firstName}")
+                    // Pasar el firstName al WelcomeFragment
+
                     val bundle = Bundle().apply {
                         putString("FIRST_NAME", loginData.firstName)
                     }
@@ -77,12 +79,12 @@ class LoginFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        // Auto-login si ya hay token
         lifecycleScope.launch {
-            val token = TokenRepository.getInstance(requireContext()).getTokenOnce()
-            if (!token.isNullOrBlank()) {
+
+            val user = TokenRepository.getInstance(requireContext()).getUser()
+            if(user != null) {
                 val bundle = Bundle().apply {
-                    putString("FIRST_NAME", "Usuario")
+                    putString("FIRST_NAME", user.firstName)
                 }
                 findNavController().navigate(R.id.action_loginFragment_to_welcomeFragment, bundle)
             }
