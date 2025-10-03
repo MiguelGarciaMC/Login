@@ -29,7 +29,7 @@ class WelcomeFragment : Fragment() {
 
 
         // Recuperar el firstName desde los argumentos
-        val firstName = arguments?.getString("FIRST_NAME") ?: "Mal"
+        val firstName = arguments?.getString("FIRST_NAME") ?: "Usuario"
         binding.txtWelcome.text = "¡Bienvenido, $firstName!"
 
         // Logout
