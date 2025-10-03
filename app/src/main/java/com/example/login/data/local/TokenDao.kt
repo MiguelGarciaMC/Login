@@ -6,13 +6,13 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
-@Dao
+@Dao //Data Access Object
 interface TokenDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(token: TokenEntity)
+    suspend fun upsert(token: TokenEntity) //ingresa o remplaza
 
-
+    //Se observa toda la fila (token + firstname)
     @Query("SELECT token FROM token WHERE id = 1 LIMIT 1")
     fun observeToken(): Flow<String?>
 
