@@ -11,10 +11,6 @@ class AuthRepository private constructor(context: Context) {
 
     private val tokenRepo = TokenRepository.getInstance(context)
 
-    /**
-     * Llama a DummyJSON, valida la respuesta y guarda el accessToken en Room.
-     * Devuelve el accessToken guardado.
-     */
     suspend fun loginAndPersist(username: String, password: String): String = withContext(Dispatchers.IO) {
         val response = ApiClient.retrofitService.login(LoginRequest(username, password))
         if (!response.isSuccessful) {

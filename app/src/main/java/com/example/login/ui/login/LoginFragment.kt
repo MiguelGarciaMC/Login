@@ -61,6 +61,7 @@ class LoginFragment : Fragment() {
 
                     android.util.Log.d("DEBUG_NAV", "Navigating with FIRST_NAME=${loginData.firstName}")
                     // Pasar el firstName al WelcomeFragment
+
                     val bundle = Bundle().apply {
                         putString("FIRST_NAME", loginData.firstName)
                     }
@@ -79,6 +80,7 @@ class LoginFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         lifecycleScope.launch {
+
             val user = TokenRepository.getInstance(requireContext()).getUser()
             if(user != null) {
                 val bundle = Bundle().apply {
