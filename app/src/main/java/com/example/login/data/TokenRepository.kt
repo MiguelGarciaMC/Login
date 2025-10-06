@@ -1,37 +1,56 @@
 package com.example.login.data
 
 import android.content.Context
-import com.example.login.data.local.TokenDatabase
+import com.example.login.data.local.AppDbHelper
+import com.example.login.data.local.TokenDao
+import com.example.login.data.local.TokenDaoImpl
 import com.example.login.data.local.TokenEntity
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 
 class TokenRepository private constructor(context: Context) {
 
-    private val dao = TokenDatabase.getInstance(context).tokenDao()
+    private val dbHelper = AppDbHelper(context.applicationContext)
+    private val dao: TokenDao = TokenDaoImpl(dbHelper)
 
-    fun observeToken(): Flow<String?> = dao.observeToken()
+    // Observabilidad simple: cache + StateFlow
+    private val mutableTokenFlow = MutableStateFlow<String?>(null)
+    val tokenFlow: StateFlow<String?> = mutableTokenFlow.asStateFlow()
 
-    suspend fun getTokenOnce(): String? = dao.getTokenOnce()
-
-    //Modificado para guardar tanto token como firstName
-    suspend fun saveToken(token: String, firstName: String) {
-        dao.upsert(TokenEntity(token = token, firstName = firstName))
+    // Inicializa el flow con el valor actual (llamar una vez desde la VM si quieres tenerlo al arrancar)
+    suspend fun init() = withContext(Dispatchers.IO) {
+        mutableTokenFlow.value = dao.getTokenOnce()
     }
 
-    //Se agrega el método para obtener el usuario
-    suspend fun getUser(): TokenEntity? = dao.getUser()
+    // Equivalentes públicos a lo que tenías:
+    fun observeToken(): Flow<String?> = tokenFlow
 
-    suspend fun clearToken() {
+    suspend fun getTokenOnce(): String? = withContext(Dispatchers.IO) {
+        dao.getTokenOnce()
+    }
+
+    suspend fun saveToken(token: String, firstName: String) = withContext(Dispatchers.IO) {
+        dao.upsert(TokenEntity(token = token, firstName = firstName))
+        // Actualiza el flow
+        mutableTokenFlow.value = token
+    }
+
+    suspend fun getUser(): TokenEntity? = withContext(Dispatchers.IO) {
+        dao.getUser()
+    }
+
+    suspend fun clearToken() = withContext(Dispatchers.IO) {
         dao.clear()
+        mutableTokenFlow.value = null
     }
 
     companion object {
         @Volatile private var INSTANCE: TokenRepository? = null
 
-        fun getInstance(context: Context): TokenRepository {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: TokenRepository(context.applicationContext).also { INSTANCE = it }
+        fun getInstance(context: Context): TokenRepository =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: TokenRepository(context).also { INSTANCE = it }
             }
-        }
     }
 }

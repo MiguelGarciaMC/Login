@@ -1,29 +1,14 @@
 package com.example.login.data.local
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
+import com.example.login.data.local.TokenEntity
 
-@Dao //Data Access Object
 interface TokenDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(token: TokenEntity) //ingresa o remplaza
+    fun upsert(token: TokenEntity)
 
-    //Se observa toda la fila (token + firstname)
-    @Query("SELECT token FROM token WHERE id = 1 LIMIT 1")
-    fun observeToken(): Flow<String?>
+    fun getTokenOnce(): String?
 
-    //Lectura puntual
-    @Query("SELECT token FROM token WHERE id = 1 LIMIT 1")
-    suspend fun getTokenOnce(): String?
+    fun clear()
 
-    @Query("DELETE FROM token WHERE id = 1")
-    suspend fun clear()
-
-    //Recupera todo dentro de la DB TOKEN
-    @Query("SELECT * FROM token WHERE id = 1 LIMIT 1")
-    suspend fun getUser(): TokenEntity?
+    fun getUser(): TokenEntity?
 }
